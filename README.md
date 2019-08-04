@@ -4,7 +4,7 @@ A collection of examples leveraging the `ndarray` ecosystem.
 
 Table of contents:
 
-- [Linear regression](https://github.com/rust-ndarray/ndarray-examples/linear_regression)
+- [Linear regression](https://github.com/rust-ndarray/ndarray-examples/tree/master/linear_regression)
 
 ## Contributing
 
