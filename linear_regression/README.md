@@ -1,7 +1,7 @@
 Linear Regression
 =================
 
-An implementation of vanilla linear regression, solving the normal equation to determine 
+An implementation of vanilla linear regression: it solves the normal equation to determine 
 the optimal coefficients.
 
 You can run the example using
