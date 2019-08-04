@@ -1,0 +1,13 @@
+[package]
+name = "linear_regression"
+version = "0.1.0"
+authors = ["LukeMathWalker"]
+edition = "2018"
+workspace = ".."
+
+[dependencies]
+ndarray = {version = "0.12", features = ["blas"]}
+ndarray-linalg = {version = "0.11.1", features = ["openblas"]}
+ndarray-stats = {git = "https://github.com/rust-ndarray/ndarray-stats", branch = "master"}
+ndarray-rand = "0.9"
+rand = "0.6"
