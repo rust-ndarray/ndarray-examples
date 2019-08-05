@@ -36,7 +36,7 @@ impl LinearRegression {
     /// to match the training data distribution.
     ///
     /// `self` is modified in place, nothing is returned.
-    pub fn fit<A, B>(&mut self, X: ArrayBase<A, Ix2>, y: ArrayBase<B, Ix1>)
+    pub fn fit<A, B>(&mut self, X: &ArrayBase<A, Ix2>, y: &ArrayBase<B, Ix1>)
     where
         A: Data<Elem = f64>,
         B: Data<Elem = f64>,
@@ -50,7 +50,7 @@ impl LinearRegression {
         self.beta = if self.fit_intercept {
             let dummy_column: Array<f64, _> = Array::ones((n_samples, 1));
             let X = stack(Axis(1), &[dummy_column.view(), X.view()]).unwrap();
-            Some(LinearRegression::solve_normal_equation(X, y))
+            Some(LinearRegression::solve_normal_equation(&X, y))
         } else {
             Some(LinearRegression::solve_normal_equation(X, y))
         };
@@ -77,13 +77,13 @@ impl LinearRegression {
         }
     }
 
-    fn solve_normal_equation<A, B>(X: ArrayBase<A, Ix2>, y: ArrayBase<B, Ix1>) -> Array1<f64>
+    fn solve_normal_equation<A, B>(X: &ArrayBase<A, Ix2>, y: &ArrayBase<B, Ix1>) -> Array1<f64>
     where
         A: Data<Elem = f64>,
         B: Data<Elem = f64>,
     {
-        let rhs = X.t().dot(&y);
-        let linear_operator = X.t().dot(&X);
+        let rhs = X.t().dot(y);
+        let linear_operator = X.t().dot(X);
         linear_operator.solve_into(rhs).unwrap()
     }
 

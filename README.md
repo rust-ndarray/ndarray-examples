@@ -2,6 +2,8 @@
 
 A collection of examples leveraging the `ndarray` ecosystem.
 
+Each example folder contains a description and instructions on how to run it. Do not run `cargo run` or `cargo build` from the top level folder!
+
 Table of contents:
 
 - [Linear regression](https://github.com/rust-ndarray/ndarray-examples/tree/master/linear_regression)
