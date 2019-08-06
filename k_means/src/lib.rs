@@ -24,6 +24,12 @@ impl KMeans {
     where
         A: Data<Elem = f64>,
     {
+        let (n_samples, _) = X.dim();
+        assert!(
+            n_samples >= self.n_clusters as usize,
+            "We need more sample points than clusters!"
+        );
+
         // Initialisation
         let centroids = KMeans::get_random_centroids(self.n_clusters, X);
         let cluster_memberships = X.map_axis(Axis(0), |sample| {
@@ -52,13 +58,13 @@ impl KMeans {
         A: Data<Elem = f64>,
         B: Data<Elem = f64>,
     {
-        let mut iterator = centroids.genrows().into_iter().enumerate();
+        let mut iterator = centroids.genrows().into_iter();
 
-        let (_, first_centroid) = iterator.next().expect("No centroids - degenerate case!");
+        let first_centroid = iterator.next().expect("No centroids - degenerate case!");
         let mut closest_index = 0;
         let mut minimum_distance = sample.sq_l2_dist(&first_centroid).unwrap();
 
-        for (index, centroid) in iterator {
+        for (index, centroid) in iterator.enumerate() {
             let distance = sample.sq_l2_dist(&centroid).unwrap();
             if distance < minimum_distance {
                 minimum_distance = distance;
