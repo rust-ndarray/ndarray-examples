@@ -5,15 +5,8 @@ authors = ["LukeMathWalker"]
 edition = "2018"
 workspace = ".."
 
-[features]
-default = []
-openblas = ["ndarray-linalg/openblas"]
-intel-mkl = ["ndarray-linalg/intel-mkl"]
-netlib = ["ndarray-linalg/netlib"]
-
 [dependencies]
-ndarray = {version = "0.12", features = ["blas"]}
-ndarray-linalg = {version = "0.11.1", optional = true, default-features = false}
+ndarray = {version = "0.12"}
 ndarray-stats = {git = "https://github.com/LukeMathWalker/ndarray-stats", branch = "generalized-deviation"}
 ndarray-rand = "0.9"
 rand = "0.6"
