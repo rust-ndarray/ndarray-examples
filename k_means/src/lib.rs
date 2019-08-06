@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
-use ndarray::{Array2, ArrayBase, Axis, Data, Ix2, Ix1};
-use rand::distributions::{Distribution, Uniform};
+use ndarray::{Array2, ArrayBase, Axis, Data, Ix1, Ix2};
 use ndarray_stats::DeviationExt;
+use rand::distributions::{Distribution, Uniform};
 
 pub struct KMeans {
     pub centroids: Option<Array2<f64>>,
@@ -24,7 +24,11 @@ impl KMeans {
     where
         A: Data<Elem = f64>,
     {
+        // Initialisation
         let centroids = KMeans::get_random_centroids(self.n_clusters, X);
+        let cluster_memberships = X.map_axis(Axis(0), |sample| {
+            KMeans::find_closest_centroid(&centroids, &sample)
+        });
     }
 
     fn get_random_centroids<A>(n_clusters: u16, X: &ArrayBase<A, Ix2>) -> Array2<f64>
