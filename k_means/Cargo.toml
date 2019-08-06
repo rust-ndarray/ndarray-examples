@@ -1,0 +1,19 @@
+[package]
+name = "k_means"
+version = "0.1.0"
+authors = ["LukeMathWalker"]
+edition = "2018"
+workspace = ".."
+
+[features]
+default = []
+openblas = ["ndarray-linalg/openblas"]
+intel-mkl = ["ndarray-linalg/intel-mkl"]
+netlib = ["ndarray-linalg/netlib"]
+
+[dependencies]
+ndarray = {version = "0.12", features = ["blas"]}
+ndarray-linalg = {version = "0.11.1", optional = true, default-features = false}
+ndarray-stats = {git = "https://github.com/rust-ndarray/ndarray-stats", branch = "master"}
+ndarray-rand = "0.9"
+rand = "0.6"
