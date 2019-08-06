@@ -1,5 +1,5 @@
 #![allow(non_snake_case)]
-use ndarray::{Array1, Array2, ArrayBase, Axis, Data, Ix2, Ix1};
+use ndarray::{Array2, ArrayBase, Axis, Data, Ix2, Ix1};
 use rand::distributions::{Distribution, Uniform};
 use ndarray_stats::DeviationExt;
 
@@ -48,7 +48,7 @@ impl KMeans {
         A: Data<Elem = f64>,
         B: Data<Elem = f64>,
     {
-        let iterator = centroids.genrows().into_iter().enumerate();
+        let mut iterator = centroids.genrows().into_iter().enumerate();
 
         let (_, first_centroid) = iterator.next().expect("No centroids - degenerate case!");
         let mut closest_index = 0;
