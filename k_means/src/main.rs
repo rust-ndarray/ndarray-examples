@@ -1,3 +1,3 @@
-pub fn main() {
+use k_means::KMeans;
 
-}
+pub fn main() {}
