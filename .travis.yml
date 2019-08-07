@@ -31,4 +31,4 @@ addons:
       - libopenblas-dev
       - gfortran
 script:
-  - ./scripts/all-tests.sh "$FEATURES" "$CHANNEL"
+  - ./tests.sh "$FEATURES" "$CHANNEL"
