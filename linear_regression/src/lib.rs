@@ -62,8 +62,8 @@ impl LinearRegression {
     ///
     /// **Panics** if `self` has not be `fit`ted before calling `predict.
     pub fn predict<A>(&self, X: &ArrayBase<A, Ix2>) -> Array1<f64>
-        where
-            A: Data<Elem = f64>,
+    where
+        A: Data<Elem = f64>,
     {
         let (n_samples, _) = X.dim();
 
