@@ -1,8 +1,8 @@
 #![allow(non_snake_case)]
-use ndarray::{Array1, Array2, Array, Axis};
+use ndarray::{Array, Array1, Array2, Axis};
 use ndarray_linalg::random;
-use ndarray_stats::DeviationExt;
 use ndarray_rand::RandomExt;
+use ndarray_stats::DeviationExt;
 use rand::distributions::StandardNormal;
 
 // Import LinearRegression from other file ("lib.rs") in this example

@@ -1,0 +1,34 @@
+language: rust
+# use trusty for newer openblas
+sudo: required
+dist: trusty
+matrix:
+  include:
+    - rust: 1.32.0
+      env:
+        - FEATURES='openblas'
+        - RUSTFLAGS='-D warnings'
+    - rust: stable
+      env:
+        - FEATURES='openblas'
+        - RUSTFLAGS='-D warnings'
+    - rust: beta
+      env:
+        - FEATURES='openblas'
+        - CHANNEL='beta'
+        - RUSTFLAGS='-D warnings'
+    - rust: nightly
+      env:
+        - FEATURES='openblas'
+        - CHANNEL='nightly'
+env:
+  global:
+    - HOST=x86_64-unknown-linux-gnu
+    - CARGO_INCREMENTAL=0
+addons:
+  apt:
+    packages:
+      - libopenblas-dev
+      - gfortran
+script:
+  - ./test.sh "$FEATURES" "$CHANNEL"
