@@ -21,7 +21,7 @@ impl KMeans {
     /// `fit` determines `self.n_clusters` centroids based on the training data distribution.
     ///
     /// `self` is modified in place, nothing is returned.
-    pub fn fit<A, B>(&mut self, X: &ArrayBase<A, Ix2>)
+    pub fn fit<A>(&mut self, X: &ArrayBase<A, Ix2>)
     where
         A: Data<Elem = f64>,
     {
@@ -38,7 +38,7 @@ impl KMeans {
 
         while !has_converged {
             // Assignment step: associate each sample to the closest centroid
-            let cluster_memberships = X.map_axis(Axis(0), |sample| {
+            let cluster_memberships = X.map_axis(Axis(1), |sample| {
                 KMeans::find_closest_centroid(&centroids, &sample)
             });
 
