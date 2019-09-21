@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
-use ndarray::{Array2, ArrayBase, Axis, Data, Ix1, Ix2};
+use ndarray::{Array1, Array2, ArrayBase, Axis, Data, Ix1, Ix2};
 use ndarray_stats::DeviationExt;
+use std::collections::HashMap;
 use rand::distributions::{Distribution, Uniform};
 
 pub struct KMeans {
@@ -35,6 +36,39 @@ impl KMeans {
         let cluster_memberships = X.map_axis(Axis(0), |sample| {
             KMeans::find_closest_centroid(&centroids, &sample)
         });
+
+        let centroids = KMeans::compute_centroids(&X, &cluster_memberships, self.n_clusters);
+    }
+
+    fn compute_centroids<A, B>(
+        X: &ArrayBase<A, Ix2>,
+        cluster_memberships: &ArrayBase<B, Ix1>,
+        n_clusters: u16
+    ) -> Array2<f64>
+    where
+        A: Data<Elem = f64>,
+        B: Data<Elem = usize>,
+    {
+        let (_, n_features) = X.dim();
+        let mut centroids: HashMap<usize, RollingMean> = HashMap::new();
+
+        let mut iterator = X.genrows().into_iter().zip(cluster_memberships.iter());
+        for (row, cluster_index) in iterator {
+            if let Some(rolling_mean) = centroids.get_mut(cluster_index) {
+                rolling_mean.accumulate(&row);
+            } else {
+                let new_centroid = RollingMean::new(row.to_owned());
+                centroids.insert(*cluster_index, new_centroid);
+            }
+        }
+
+        let mut new_centroids: Array2<f64> = Array2::zeros((n_clusters as usize, n_features));
+        for (cluster_index, centroid) in centroids.into_iter() {
+            let mut new_centroid = new_centroids.index_axis_mut(Axis(0), cluster_index);
+            new_centroid.assign(&centroid.current_mean);
+        }
+
+        new_centroids
     }
 
     fn get_random_centroids<A>(n_clusters: u16, X: &ArrayBase<A, Ix2>) -> Array2<f64>
@@ -73,5 +107,26 @@ impl KMeans {
         }
 
         closest_index
+    }
+}
+
+struct RollingMean {
+    pub current_mean: Array1<f64>,
+    n_samples: u64,
+}
+
+impl RollingMean {
+    pub fn new(first_sample: Array1<f64>) -> Self {
+        RollingMean { current_mean: first_sample, n_samples: 1 }
+    }
+
+    pub fn accumulate<A>(&mut self, new_sample: &ArrayBase<A, Ix1>)
+    where
+        A: Data<Elem = f64>,
+    {
+        let mut increment: Array1<f64> = &self.current_mean - new_sample;
+        increment.mapv_inplace(|x| x / (self.n_samples + 1) as f64);
+        self.current_mean -= &increment;
+        self.n_samples += 1;
     }
 }
