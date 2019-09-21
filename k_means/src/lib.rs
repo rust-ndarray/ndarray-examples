@@ -18,7 +18,7 @@ impl KMeans {
     }
 
     /// Given an input matrix `X`, with shape `(n_samples, n_features)`
-    /// `fit` determines a set of centroids based on the training data distribution.
+    /// `fit` determines `self.n_clusters` centroids based on the training data distribution.
     ///
     /// `self` is modified in place, nothing is returned.
     pub fn fit<A, B>(&mut self, X: &ArrayBase<A, Ix2>)
@@ -52,7 +52,7 @@ impl KMeans {
         let (_, n_features) = X.dim();
         let mut centroids: HashMap<usize, RollingMean> = HashMap::new();
 
-        let mut iterator = X.genrows().into_iter().zip(cluster_memberships.iter());
+        let iterator = X.genrows().into_iter().zip(cluster_memberships.iter());
         for (row, cluster_index) in iterator {
             if let Some(rolling_mean) = centroids.get_mut(cluster_index) {
                 rolling_mean.accumulate(&row);
