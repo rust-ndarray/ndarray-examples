@@ -1,8 +1,8 @@
 #![allow(non_snake_case)]
 use ndarray::{Array1, Array2, ArrayBase, Axis, Data, Ix1, Ix2};
 use ndarray_stats::DeviationExt;
-use std::collections::HashMap;
 use rand::distributions::{Distribution, Uniform};
+use std::collections::HashMap;
 
 pub struct KMeans {
     pub centroids: Option<Array2<f64>>,
@@ -44,7 +44,8 @@ impl KMeans {
             });
 
             // Update step: calculate the mean of each cluster and use it as the new centroid
-            let new_centroids = KMeans::compute_centroids(&X, &cluster_memberships, self.n_clusters);
+            let new_centroids =
+                KMeans::compute_centroids(&X, &cluster_memberships, self.n_clusters);
 
             // Check convergence condition (very naive, we need an epsilon tolerance here)
             let distance = centroids.sq_l2_dist(&new_centroids).unwrap();
@@ -59,7 +60,7 @@ impl KMeans {
     fn compute_centroids<A, B>(
         X: &ArrayBase<A, Ix2>,
         cluster_memberships: &ArrayBase<B, Ix1>,
-        n_clusters: u16
+        n_clusters: u16,
     ) -> Array2<f64>
     where
         A: Data<Elem = f64>,
@@ -134,7 +135,10 @@ struct RollingMean {
 
 impl RollingMean {
     pub fn new(first_sample: Array1<f64>) -> Self {
-        RollingMean { current_mean: first_sample, n_samples: 1 }
+        RollingMean {
+            current_mean: first_sample,
+            n_samples: 1,
+        }
     }
 
     pub fn accumulate<A>(&mut self, new_sample: &ArrayBase<A, Ix1>)

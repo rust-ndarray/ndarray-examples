@@ -1,5 +1,5 @@
 #![allow(non_snake_case)]
-use ndarray::{Array, Array2, Axis, stack};
+use ndarray::{stack, Array, Array2, Axis};
 use ndarray_rand::RandomExt;
 use rand::distributions::Normal;
 
@@ -28,8 +28,5 @@ pub fn main() {
     let mut k_means = KMeans::new(n_clusters);
     k_means.fit(&X);
 
-    println!(
-        "The centroids are {:.3}",
-        k_means.centroids.unwrap()
-    );
+    println!("The centroids are {:.3}", k_means.centroids.unwrap());
 }
