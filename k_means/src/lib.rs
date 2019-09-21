@@ -49,7 +49,6 @@ impl KMeans {
             // Check convergence condition (very naive, we need an epsilon tolerance here)
             let distance = centroids.sq_l2_dist(&new_centroids).unwrap();
             has_converged = distance < tolerance;
-            println!("Centroid distance: {:?}", distance);
 
             centroids = new_centroids;
         }
@@ -119,7 +118,8 @@ impl KMeans {
             let distance = sample.sq_l2_dist(&centroid).unwrap();
             if distance < minimum_distance {
                 minimum_distance = distance;
-                closest_index = index;
+                // We skipped the first centroid in the for loop
+                closest_index = index + 1;
             }
         }
 
