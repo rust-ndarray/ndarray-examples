@@ -1,7 +1,6 @@
 #![allow(non_snake_case)]
 use ndarray::{Array1, Array2, ArrayBase, Axis, Data, Ix1, Ix2};
 use ndarray_stats::DeviationExt;
-use rand::distributions::{Distribution, Uniform};
 use std::collections::HashMap;
 
 /// K-means clustering aims to partition a set of observations
@@ -69,7 +68,7 @@ impl KMeans {
             // Update step: using the newly computed `cluster_memberships`,
             // compute the new centroids, the means of our clusters
             let new_centroids =
-                KMeans::compute_centroids(&X, &cluster_memberships, self.n_clusters);
+                KMeans::compute_centroids(&X, &cluster_memberships);
 
             // Check the convergence condition: if the new centroids,
             // after the assignment-update cycle, are closer to the old centroids
@@ -139,11 +138,8 @@ impl KMeans {
         A: Data<Elem = f64>,
     {
         let (n_samples, _) = X.dim();
-        let distribution = Uniform::from(0..n_samples);
         let mut rng = rand::thread_rng();
-        let indices: Vec<_> = (0..n_clusters)
-            .map(|_| distribution.sample(&mut rng))
-            .collect();
+        let indices = rand::seq::index::sample(&mut rng, n_samples, n_clusters as usize).into_vec();
         X.select(Axis(0), &indices)
     }
 
