@@ -4,8 +4,28 @@ use ndarray_stats::DeviationExt;
 use rand::distributions::{Distribution, Uniform};
 use std::collections::HashMap;
 
+/// K-means clustering aims to partition a set of observations
+/// into `self.n_clusters` clusters, where each observation belongs
+/// to the cluster with the nearest mean.
+///
+/// The mean of the points within a cluster is called *centroid*.
+///
+/// Given the set of `centroids`, you can assign an observation to a cluster
+/// choosing the nearest centroid.
+///
+/// Details on the algorithm can be found [here](https://en.wikipedia.org/wiki/K-means_clustering).
+///
+/// We are implementing the _standard algorithm_.
 pub struct KMeans {
+    /// Our set of centroids.
+    ///
+    /// Before `fit` is called, it's set to `None`.
+    ///
+    /// Once `fit` is called, we will have our set of centroids: the `centroids` matrix
+    /// has shape `(n_clusters, n_features)`.
     pub centroids: Option<Array2<f64>>,
+    /// The number of clusters we are trying to subdivide our observations into.
+    /// It's set before-hand.
     n_clusters: u16,
 }
 
