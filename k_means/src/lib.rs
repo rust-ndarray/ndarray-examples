@@ -32,9 +32,10 @@ impl KMeans {
         );
 
         let mut has_converged = false;
+        let tolerance = 1e-3;
 
         // Initialisation
-        let centroids = KMeans::get_random_centroids(self.n_clusters, X);
+        let mut centroids = KMeans::get_random_centroids(self.n_clusters, X);
 
         while !has_converged {
             // Assignment step: associate each sample to the closest centroid
@@ -46,8 +47,14 @@ impl KMeans {
             let new_centroids = KMeans::compute_centroids(&X, &cluster_memberships, self.n_clusters);
 
             // Check convergence condition (very naive, we need an epsilon tolerance here)
-            has_converged = centroids == new_centroids;
+            let distance = centroids.sq_l2_dist(&new_centroids).unwrap();
+            has_converged = distance < tolerance;
+            println!("Centroid distance: {:?}", distance);
+
+            centroids = new_centroids;
         }
+
+        self.centroids = Some(centroids);
     }
 
     fn compute_centroids<A, B>(
