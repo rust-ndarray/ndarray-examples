@@ -19,9 +19,9 @@ fn get_data(n_samples: usize, n_features: usize) -> Array2<f64> {
 }
 
 pub fn main() {
-    let n_samples = 5000000;
+    let n_samples = 50000;
     let n_features = 3;
-    let n_clusters = 8;
+    let n_clusters = 2;
 
     let X = get_data(n_samples, n_features);
 
