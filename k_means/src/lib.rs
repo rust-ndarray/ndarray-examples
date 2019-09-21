@@ -88,31 +88,46 @@ impl KMeans {
         self.centroids = Some(centroids);
     }
 
+    /// Given our observations, `X`, and the index to which each observation belongs,
+    /// stored in `cluster_memberships`,
+    /// we want to compute the mean of all observations in each cluster.
     fn compute_centroids<A, B>(
         X: &ArrayBase<A, Ix2>,
         cluster_memberships: &ArrayBase<B, Ix1>,
-        n_clusters: u16,
     ) -> Array2<f64>
     where
         A: Data<Elem = f64>,
         B: Data<Elem = usize>,
     {
         let (_, n_features) = X.dim();
+        // `centroids` is a cluster index -> rolling mean mapping.
+        // We will update it while we iterate over our observations.
         let mut centroids: HashMap<usize, RollingMean> = HashMap::new();
 
+        // We iterate over our observations and cluster memberships in lock-step.
         let iterator = X.genrows().into_iter().zip(cluster_memberships.iter());
         for (row, cluster_index) in iterator {
+            // If we have already encountered an observation that belongs to the
+            // `cluster_index`th cluster, we retrieve the current rolling mean (our new centroid)
+            // and we update it using the current observation.
             if let Some(rolling_mean) = centroids.get_mut(cluster_index) {
                 rolling_mean.accumulate(&row);
             } else {
+                // If we have not yet encountered an observation that belongs to the
+                // `cluster_index`th cluster, we set its centroid to `row`,
+                // initialising our `RollingMean` accumulator.
                 let new_centroid = RollingMean::new(row.to_owned());
+                // .to_owned takes our `row` view as input and returns an owned array.
                 centroids.insert(*cluster_index, new_centroid);
             }
         }
 
-        let mut new_centroids: Array2<f64> = Array2::zeros((n_clusters as usize, n_features));
+        // Convert our `HashMap` into a 2d array.
+        let mut new_centroids: Array2<f64> = Array2::zeros((centroids.len(), n_features));
         for (cluster_index, centroid) in centroids.into_iter() {
             let mut new_centroid = new_centroids.index_axis_mut(Axis(0), cluster_index);
+            // .assign sets each element of `new_centroid`
+            // to the corresponding element in `centroid.current_mean`.
             new_centroid.assign(&centroid.current_mean);
         }
 
