@@ -31,13 +31,23 @@ impl KMeans {
             "We need more sample points than clusters!"
         );
 
+        let mut has_converged = false;
+
         // Initialisation
         let centroids = KMeans::get_random_centroids(self.n_clusters, X);
-        let cluster_memberships = X.map_axis(Axis(0), |sample| {
-            KMeans::find_closest_centroid(&centroids, &sample)
-        });
 
-        let centroids = KMeans::compute_centroids(&X, &cluster_memberships, self.n_clusters);
+        while !has_converged {
+            // Assignment step: associate each sample to the closest centroid
+            let cluster_memberships = X.map_axis(Axis(0), |sample| {
+                KMeans::find_closest_centroid(&centroids, &sample)
+            });
+
+            // Update step: calculate the mean of each cluster and use it as the new centroid
+            let new_centroids = KMeans::compute_centroids(&X, &cluster_memberships, self.n_clusters);
+
+            // Check convergence condition (very naive, we need an epsilon tolerance here)
+            has_converged = centroids == new_centroids;
+        }
     }
 
     fn compute_centroids<A, B>(
