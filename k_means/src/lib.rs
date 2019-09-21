@@ -30,6 +30,8 @@ pub struct KMeans {
 }
 
 impl KMeans {
+    /// The number of clusters we are looking for has to be chosen before-hand,
+    /// hence we take it as a constructor parameter of our `KMeans` struct.
     pub fn new(n_clusters: u16) -> KMeans {
         KMeans {
             centroids: None,
@@ -40,7 +42,7 @@ impl KMeans {
     /// Given an input matrix `X`, with shape `(n_samples, n_features)`
     /// `fit` determines `self.n_clusters` centroids based on the training data distribution.
     ///
-    /// `self` is modified in place, nothing is returned.
+    /// `self` is modified in place (`self.centroids` is mutated), nothing is returned.
     pub fn fit<A>(&mut self, X: &ArrayBase<A, Ix2>)
     where
         A: Data<Elem = f64>,
@@ -51,29 +53,38 @@ impl KMeans {
             "We need more sample points than clusters!"
         );
 
-        let mut has_converged = false;
         let tolerance = 1e-3;
 
-        // Initialisation
+        // Initialisation: we use the Forgy method - we pick `self.n_clusters` random
+        // observations and we use them as our first set of centroids.
         let mut centroids = KMeans::get_random_centroids(self.n_clusters, X);
 
-        while !has_converged {
+        // Keep repeating the assignment-update steps until we have convergence
+        loop {
             // Assignment step: associate each sample to the closest centroid
             let cluster_memberships = X.map_axis(Axis(1), |sample| {
                 KMeans::find_closest_centroid(&centroids, &sample)
             });
 
-            // Update step: calculate the mean of each cluster and use it as the new centroid
+            // Update step: using the newly computed `cluster_memberships`,
+            // compute the new centroids, the means of our clusters
             let new_centroids =
                 KMeans::compute_centroids(&X, &cluster_memberships, self.n_clusters);
 
-            // Check convergence condition (very naive, we need an epsilon tolerance here)
+            // Check the convergence condition: if the new centroids,
+            // after the assignment-update cycle, are closer to the old centroids
+            // than a pre-established tolerance we are finished.
             let distance = centroids.sq_l2_dist(&new_centroids).unwrap();
-            has_converged = distance < tolerance;
+            let has_converged = distance < tolerance;
 
             centroids = new_centroids;
+
+            if has_converged {
+                break;
+            }
         }
 
+        // Set `self.centroids` to the outcome of our optimisation process.
         self.centroids = Some(centroids);
     }
 
