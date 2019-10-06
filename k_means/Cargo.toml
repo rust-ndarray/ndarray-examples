@@ -6,7 +6,7 @@ edition = "2018"
 workspace = ".."
 
 [dependencies]
-ndarray = {version = "0.12"}
-ndarray-stats = {git = "https://github.com/LukeMathWalker/ndarray-stats", branch = "master"}
-ndarray-rand = "0.10"
+ndarray = {version = "0.13"}
+ndarray-stats = "0.3"
+ndarray-rand = "0.11"
 rand = "0.7"
