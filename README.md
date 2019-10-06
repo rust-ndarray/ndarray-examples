@@ -7,6 +7,7 @@ Each example folder contains a description and instructions on how to run it. Do
 Table of contents:
 
 - [Linear regression](https://github.com/rust-ndarray/ndarray-examples/tree/master/linear_regression)
+- [K-Means clustering](https://github.com/rust-ndarray/ndarray-examples/tree/master/k_means)
 
 ## Contributing
 
