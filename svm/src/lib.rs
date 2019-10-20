@@ -23,7 +23,7 @@ impl SupportVectorMachine {
 
         assert!(
             n_samples == y.dim(),
-            "We need the same number of samples as well targets!"
+            "We need the same number of samples as well as targets!"
         );
 
         let mut multiplier = Array::ones(n_samples);
@@ -49,6 +49,8 @@ impl SupportVectorMachine {
 
         let normal = (&y * &multiplier).dot(X);
         let z = &X.dot(&normal);
+
+        // TODO pick min from positive and max from negative class
         let bias = (z.min().unwrap() + z.max().unwrap()) / 2.0;
 
         self.normal = Some(normal);
