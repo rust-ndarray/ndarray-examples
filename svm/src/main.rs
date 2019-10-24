@@ -1,32 +1,54 @@
 #![allow(non_snake_case)]
-use ndarray::{stack, Array, Array2, Axis};
-use ndarray_rand::RandomExt;
-use ndarray_rand::rand_distr::Normal;
+use std::path::Path;
+use std::fs::File;
+use std::io::{BufReader, BufRead};
 
+use ndarray::{Array, Array2, Axis};
+use ndarray_stats::QuantileExt;
 
-use svm::SupportVectorMachine;
+use svm::{SupportVectorMachine, scores};
 
-/// It returns a data distribution.
-///
-/// The data is clearly centered around two distinct points,
-/// to quickly spot if something is wrong with the KMeans algorithm
-/// looking at the output.
-fn get_data(n_samples: usize, n_features: usize) -> (Array2<f64>, Vec<bool>) {
-    let shape = (n_samples / 2, n_features);
-    let X1: Array2<f64> = Array::random(shape, Normal::new(100., 5.0).unwrap());
-    let X2: Array2<f64> = Array::random(shape, Normal::new(-100., 5.0).unwrap());
+/// Read in dataset
+fn dataset<T: AsRef<Path> + Copy>(path: T) -> (Array2<f64>, Vec<bool>) {
+    let num_lines = BufReader::new(File::open(path).unwrap()).lines().count();
+    let mut x = Array::zeros((num_lines, 20));
+    let mut y = Vec::with_capacity(num_lines);
 
-    (
-        stack(Axis(0), &[X1.view(), X2.view()]).unwrap().to_owned(),
-        (0..n_samples).map(|i| i < n_samples/2).collect()
-    )
+    for (i1, line) in BufReader::new(File::open(path).unwrap()).lines().map(|x| x.unwrap()).enumerate() {
+        let mut iter = line.split(",").skip(1);
+        y.push(iter.next().unwrap() == "M");
+
+        for (i2, elm) in iter.map(|x| x.parse::<f64>().unwrap()).take(20).enumerate() {
+            x[(i1,i2)] = elm;
+        }
+    }
+
+    for mut col in x.axis_iter_mut(Axis(1)) {
+        let min = *col.min().unwrap();
+        let max = *col.max().unwrap();
+        col -= min;
+        col /= max - min;
+    }
+
+    (x, y)
 }
 
 fn main() {
-    let (X,y) = get_data(1000, 100);
+    let (X,y) = dataset("./src/wdbc.data");
+
+    let split_idx = (X.dim().0 as f64 * 0.9).floor() as usize;
+    let (training_x, testing_x) = X.view().split_at(Axis(0), split_idx);
+    let (training_y, testing_y) = y.split_at(split_idx);
 
     let mut svm = SupportVectorMachine::new();
-    svm.fit(&X, &y);
+    svm.fit(&training_x, &training_y);
 
-    println!("{:?}", svm.predict(&X));
+    // calculate precision
+    let prediction = svm.predict(&testing_x);
+
+    println!("Accuracy {}, Precision {}, Recall {}, F1 score {}", 
+             scores::accuracy(&prediction, &testing_y),
+             scores::precision(&prediction, &testing_y),
+             scores::recall(&prediction, &testing_y),
+             scores::f1_score(&prediction, &testing_y));
 }
