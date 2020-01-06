@@ -3,4 +3,5 @@ members = [
   "./",
   "linear_regression",
   "k_means",
+  "convolution_1d",
 ]
